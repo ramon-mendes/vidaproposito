@@ -11,28 +11,60 @@ class PageHome extends StatefulWidget {
 }
 
 class _PageHomeState extends State<PageHome> {
+  List<int>? _readed;
+
   @override
   void initState() {
     super.initState();
+    _reloadStatus();
+  }
+
+  _reloadStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      var list = prefs.getStringList('readed');
+      list ??= [];
+      _readed = list.map((e) => int.parse(e)).toList();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_readed == null) return Container();
+
     return Material(
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: SafeArea(
-          child: Column(
-            children: [
-              const Text('Uma vida com propósito'),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: 40,
-                  itemBuilder: (BuildContext context, int index) =>
-                      _buildListItem(index),
+      child: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/concrete_seamless.jpg'),
+            repeat: ImageRepeat.repeat,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Uma vida com propósito',
+                  style: TextStyle(fontSize: 30),
                 ),
-              ),
-            ],
+                const SizedBox(height: 5),
+                const Text(
+                  'Seu progresso: 1/41',
+                  style: TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: 40,
+                    itemBuilder: (BuildContext context, int index) =>
+                        _buildListItem(index),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -51,14 +83,16 @@ class _PageHomeState extends State<PageHome> {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(15),
           child: Container(
-            color: const Color(0xffAF762F),
+            color: _readed!.contains(index)
+                ? const Color(0xffAF762F)
+                : const Color.fromARGB(255, 206, 206, 206),
             child: Container(
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: const AssetImage('assets/cross.jpg'),
                   fit: BoxFit.cover,
                   colorFilter: ColorFilter.mode(
-                      Colors.black.withOpacity(0.2), BlendMode.dstATop),
+                      Colors.black.withOpacity(0.6), BlendMode.dstATop),
                 ),
               ),
               child: Padding(
@@ -67,7 +101,7 @@ class _PageHomeState extends State<PageHome> {
                   children: [
                     const SizedBox(height: 100),
                     Text(
-                      'Dia $index',
+                      index == 0 ? 'Introdução' : 'Dia ${index + 1}',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.outfit(
                         // ignore: prefer_const_constructors
