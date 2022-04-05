@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:vidaproposito/classes/prefs.dart';
 import 'package:vidaproposito/page_dayview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,7 +12,8 @@ class PageHome extends StatefulWidget {
 }
 
 class _PageHomeState extends State<PageHome> {
-  List<int>? _readed;
+  Map<String, dynamic>? _readedmap;
+  Prefs _prefs = Prefs();
 
   @override
   void initState() {
@@ -20,17 +22,18 @@ class _PageHomeState extends State<PageHome> {
   }
 
   _reloadStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      var list = prefs.getStringList('readed');
-      list ??= [];
-      _readed = list.map((e) => int.parse(e)).toList();
-    });
+    _readedmap = await _prefs.completedMap();
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_readed == null) return Container();
+    if (_readedmap == null) return Container();
+    int readcnt = _readedmap!.entries
+        .where(
+          (element) => element.value == true,
+        )
+        .length;
 
     return Material(
       child: Container(
@@ -41,7 +44,7 @@ class _PageHomeState extends State<PageHome> {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.all(20.0),
           child: SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -51,14 +54,14 @@ class _PageHomeState extends State<PageHome> {
                   style: TextStyle(fontSize: 30),
                 ),
                 const SizedBox(height: 5),
-                const Text(
-                  'Seu progresso: 1/41',
-                  style: TextStyle(fontSize: 16),
+                Text(
+                  'Seu progresso: $readcnt/41',
+                  style: const TextStyle(fontSize: 16),
                 ),
                 const SizedBox(height: 20),
                 Expanded(
                   child: ListView.builder(
-                    itemCount: 40,
+                    itemCount: 41,
                     itemBuilder: (BuildContext context, int index) =>
                         _buildListItem(index),
                   ),
@@ -72,20 +75,25 @@ class _PageHomeState extends State<PageHome> {
   }
 
   Widget _buildListItem(int index) {
+    bool readed = false;
+
+    if (_readedmap![index.toString()] == true) {
+      readed = true;
+    }
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 12),
       child: GestureDetector(
         onTap: () async {
           await Navigator.pushNamed(context, PageDayView.routeName,
               arguments: index);
-          //_reloadData();
+          _reloadStatus();
         },
         child: ClipRRect(
           borderRadius: BorderRadius.circular(15),
           child: Container(
-            color: _readed!.contains(index)
-                ? const Color(0xffAF762F)
-                : const Color.fromARGB(255, 206, 206, 206),
+            color:
+                readed ? Color(0xffAF762F) : Color.fromARGB(255, 206, 206, 206),
             child: Container(
               decoration: BoxDecoration(
                 image: DecorationImage(
@@ -101,7 +109,7 @@ class _PageHomeState extends State<PageHome> {
                   children: [
                     const SizedBox(height: 100),
                     Text(
-                      index == 0 ? 'Introdução' : 'Dia ${index + 1}',
+                      index == 0 ? 'Introdução' : 'Dia ${index}',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.outfit(
                         // ignore: prefer_const_constructors

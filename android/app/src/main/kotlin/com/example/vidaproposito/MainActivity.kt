@@ -1,4 +1,4 @@
-package com.example.vidaproposito
+package br.com.misoftware.vidaproposito
 
 import io.flutter.embedding.android.FlutterActivity
 
