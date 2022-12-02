@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vidaproposito/page_dayview.dart';
 import 'package:vidaproposito/page_debug.dart';
+import 'package:vidaproposito/page_debug2.dart';
 import 'package:vidaproposito/page_home.dart';
 
 void main() {
@@ -41,6 +42,7 @@ class _MyAppState extends State<MyApp> {
         PageHome.routeName: (BuildContext context) => PageHome(),
         PageDayView.routeName: (BuildContext context) => PageDayView(),
         PageDebug.routeName: (BuildContext context) => PageDebug(),
+        PageDebug2.routeName: (BuildContext context) => PageDebug2(),
       },
     );
   }

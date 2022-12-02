@@ -25,6 +25,8 @@ class AudioPlayerState extends State<AudioPlayer> {
 
   @override
   void initState() {
+    super.initState();
+
     _playerStateChangedSubscription =
         _audioPlayer.playerStateStream.listen((state) async {
       if (state.processingState == ap.ProcessingState.completed) {
@@ -32,17 +34,12 @@ class AudioPlayerState extends State<AudioPlayer> {
       }
       setState(() {});
     });
+
     _positionChangedSubscription =
         _audioPlayer.positionStream.listen((position) => setState(() {}));
     _durationChangedSubscription =
         _audioPlayer.durationStream.listen((duration) => setState(() {}));
-    _init();
-
-    super.initState();
-  }
-
-  Future<void> _init() async {
-    await _audioPlayer.setUrl(widget.url);
+    _audioPlayer.setUrl(widget.url);
   }
 
   @override
@@ -89,11 +86,11 @@ class AudioPlayerState extends State<AudioPlayer> {
         child: InkWell(
           child:
               SizedBox(width: _controlSize, height: _controlSize, child: icon),
-          onTap: () {
+          onTap: () async {
             if (_audioPlayer.playerState.playing) {
-              pause();
+              await pause();
             } else {
-              play();
+              await play();
             }
           },
         ),

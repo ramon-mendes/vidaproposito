@@ -1,20 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:showcaseview/showcaseview.dart';
 import 'package:vidaproposito/classes/consts.dart';
 import 'package:vidaproposito/classes/prefs.dart';
 import 'package:vidaproposito/widgets/audio_player.dart';
 
-class PageDayView extends StatefulWidget {
+class PageDayView extends StatelessWidget {
+  const PageDayView({Key? key}) : super(key: key);
   static const routeName = '/pagedayview';
 
   @override
-  State<PageDayView> createState() => _PageDayViewState();
+  Widget build(BuildContext context) {
+    return ShowCaseWidget(
+      builder: Builder(builder: (context) => const DayWidget()),
+    );
+  }
 }
 
-class _PageDayViewState extends State<PageDayView> {
+class DayWidget extends StatefulWidget {
+  const DayWidget({Key? key}) : super(key: key);
+
+  @override
+  State<DayWidget> createState() => _DayWidgetState();
+}
+
+class _DayWidgetState extends State<DayWidget> {
+  static bool _showcase_shown = false;
   bool _loaded = false;
   int _idx = 0;
   bool _readed = false;
   final Prefs _prefs = Prefs();
+  GlobalKey _one = GlobalKey();
 
   @override
   void initState() {
@@ -30,6 +45,11 @@ class _PageDayViewState extends State<PageDayView> {
 
     setState(() {
       _loaded = true;
+      if (!_showcase_shown) {
+        _showcase_shown = true;
+        WidgetsBinding.instance.addPostFrameCallback(
+            (_) => ShowCaseWidget.of(context).startShowCase([_one]));
+      }
     });
   }
 
@@ -44,6 +64,17 @@ class _PageDayViewState extends State<PageDayView> {
   @override
   Widget build(BuildContext context) {
     if (!_loaded) return Container();
+
+    String name = 'Dia ${_idx}';
+    if (_idx == 0) {
+      name = 'Introdução';
+    }
+    if (_idx == 41) {
+      name = 'Dia 41 (bônus)';
+    }
+    if (_idx == 42) {
+      name = 'Dia 42 (bônus)';
+    }
 
     return SafeArea(
       child: Material(
@@ -66,15 +97,20 @@ class _PageDayViewState extends State<PageDayView> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        _idx == 0 ? 'Introdução' : ('Dia ' + _idx.toString()),
+                        name,
                         style: const TextStyle(fontSize: 34),
                       ),
-                      Switch(
-                        activeColor: Theme.of(context).colorScheme.primary,
-                        value: _readed,
-                        onChanged: (value) {
-                          _toggleReaded();
-                        },
+                      Showcase(
+                        key: _one,
+                        description:
+                            'Clique aqui para marcar esse dia como lido',
+                        child: Switch(
+                          activeColor: Theme.of(context).colorScheme.primary,
+                          value: _readed,
+                          onChanged: (value) {
+                            _toggleReaded();
+                          },
+                        ),
                       ),
                     ],
                   ),
@@ -88,10 +124,10 @@ class _PageDayViewState extends State<PageDayView> {
                   repeat: ImageRepeat.repeat,
                 ),
               ),
-              child: const Padding(
-                padding: EdgeInsets.all(8.0),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: AudioPlayer(
-                  url: Consts.BASEURL + '1.mp3',
+                  url: Consts.BASEURL + _idx.toString() + '.mp3',
                 ),
               ),
             ),

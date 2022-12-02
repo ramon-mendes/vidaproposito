@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vidaproposito/classes/prefs.dart';
 import 'package:vidaproposito/page_dayview.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vidaproposito/page_debug2.dart';
 
 class PageHome extends StatefulWidget {
   static const routeName = '/pagehome';
@@ -13,7 +13,7 @@ class PageHome extends StatefulWidget {
 
 class _PageHomeState extends State<PageHome> {
   Map<String, dynamic>? _readedmap;
-  Prefs _prefs = Prefs();
+  final Prefs _prefs = Prefs();
 
   @override
   void initState() {
@@ -49,9 +49,14 @@ class _PageHomeState extends State<PageHome> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text(
-                  'Uma vida com propósito',
-                  style: TextStyle(fontSize: 30),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pushNamed(PageDebug2.routeName);
+                  },
+                  child: const Text(
+                    'Uma Vida com Propósito',
+                    style: TextStyle(fontSize: 30),
+                  ),
                 ),
                 const SizedBox(height: 5),
                 Text(
@@ -61,7 +66,7 @@ class _PageHomeState extends State<PageHome> {
                 const SizedBox(height: 20),
                 Expanded(
                   child: ListView.builder(
-                    itemCount: 41,
+                    itemCount: 43,
                     itemBuilder: (BuildContext context, int index) =>
                         _buildListItem(index),
                   ),
@@ -79,6 +84,17 @@ class _PageHomeState extends State<PageHome> {
 
     if (_readedmap![index.toString()] == true) {
       readed = true;
+    }
+
+    String name = 'Dia ${index}';
+    if (index == 0) {
+      name = 'Introdução';
+    }
+    if (index == 41) {
+      name = 'Dia 41 (bônus)';
+    }
+    if (index == 42) {
+      name = 'Dia 42 (bônus)';
     }
 
     return Padding(
@@ -109,7 +125,7 @@ class _PageHomeState extends State<PageHome> {
                   children: [
                     const SizedBox(height: 100),
                     Text(
-                      index == 0 ? 'Introdução' : 'Dia ${index}',
+                      name,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.outfit(
                         // ignore: prefer_const_constructors
